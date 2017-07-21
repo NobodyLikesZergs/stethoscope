@@ -3,4 +3,6 @@
     <string name="listen_button">Слушать</string>
     <string name="history_button">История</string>
     <string name="help_button">Помощь</string>
+    <string name="new_person">Новая анкета</string>
+    <string name="connect_device">Пожалуйста, подключите устройство</string>
 </resources>

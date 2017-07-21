@@ -1,14 +1,107 @@
 package edu.phystech.stethoscope;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
+
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import edu.phystech.stethoscope.player.DeviceConnectionManager;
+import io.reactivex.Observer;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.disposables.Disposables;
 
 public class MainActivity extends AppCompatActivity {
+
+    @Inject
+    DeviceConnectionManager deviceConnectionManager;
+
+    @BindView(R.id.listen_button)
+    Button listenButton;
+    @BindView(R.id.history_button)
+    Button historyButton;
+    @BindView(R.id.help_button)
+    Button helpButton;
+
+    private int state = DeviceConnectionManager.STATE_DISCONNECTED;
+
+    private Disposable stateDisposable = Disposables.disposed();
+    private Observer<Integer> stateObserver = new Observer<Integer>() {
+        @Override
+        public void onSubscribe(@NonNull Disposable d) {
+            stateDisposable = d;
+        }
+
+        @Override
+        public void onNext(@NonNull Integer integer) {
+            state = integer;
+        }
+
+        @Override
+        public void onError(@NonNull Throwable e) {
+            e.printStackTrace();
+        }
+
+        @Override
+        public void onComplete() {
+
+        }
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        inject();
+        subscribeOnState();
+        deviceConnectionManager.startListening();
+        initViews();
     }
+
+    private void inject() {
+        MyApplication.getAppComponent().inject(this);
+    }
+
+    private void subscribeOnState() {
+        unsubscribe();
+        deviceConnectionManager.getStateSubject().subscribe(stateObserver);
+    }
+
+    private void unsubscribe() {
+        if (!stateDisposable.isDisposed()) {
+            stateDisposable.dispose();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        unsubscribe();
+        super.onDestroy();
+    }
+
+    private void initViews() {
+        ButterKnife.bind(this);
+        listenButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (state == DeviceConnectionManager.STATE_CONNECTED) {
+                    startActivity(new Intent(MainActivity.this, CreatePersonActivity.class));
+                } else {
+                    //TODO remove this command
+                    startActivity(new Intent(MainActivity.this, CreatePersonActivity.class));
+                    Toast.makeText(MainActivity.this, R.string.connect_device, Toast.LENGTH_SHORT)
+                            .show();
+                }
+            }
+        });
+    }
+
 
     //    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
 //    private static final int REQUEST_EXTERNAL_STORAGE_PERMISSION = 302;

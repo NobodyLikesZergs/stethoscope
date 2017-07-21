@@ -18,7 +18,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public static final String DB_NAME = "st_db";
     public static final String FIRST_NAME = "first_name";
     public static final String LAST_NAME = "last_name";
-    public static final String MIDDLE_NAME = "middle_name";
     public static final String AGE = "age";
     public static final String DATE = "date";
     public static final String COMMENT = "comment";
@@ -29,7 +28,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                     ID + " integer PRIMARY KEY AUTOINCREMENT NOT NULL, " +
                     FIRST_NAME + " text NOT NULL, " +
                     LAST_NAME + " text NOT NULL," +
-                    MIDDLE_NAME + " text NOT NULL," +
                     AGE + " integer NOT NULL," +
                     DATE + " text NOT NULL," +
                     COMMENT + " text NOT NULL" + ");" +
