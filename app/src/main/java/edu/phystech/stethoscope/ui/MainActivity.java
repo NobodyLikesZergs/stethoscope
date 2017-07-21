@@ -1,4 +1,4 @@
-package edu.phystech.stethoscope;
+package edu.phystech.stethoscope.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,7 +11,10 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import edu.phystech.stethoscope.MyApplication;
+import edu.phystech.stethoscope.R;
 import edu.phystech.stethoscope.player.DeviceConnectionManager;
+import edu.phystech.stethoscope.ui.history.HistoryActivity;
 import io.reactivex.Observer;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
@@ -98,6 +101,12 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, R.string.connect_device, Toast.LENGTH_SHORT)
                             .show();
                 }
+            }
+        });
+        historyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, HistoryActivity.class));
             }
         });
     }

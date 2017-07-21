@@ -21,18 +21,17 @@ public class DataManager {
         this.dbHelper = dbHelper;
     }
 
-    public Person savePerson(String firstName, String lastName, String middleName,
+    public Person savePerson(String firstName, String lastName,
                              int age, String date, String comment) {
         ContentValues cv = new ContentValues();
         cv.put(DataBaseHelper.FIRST_NAME, firstName);
         cv.put(DataBaseHelper.LAST_NAME, lastName);
-        cv.put(DataBaseHelper.MIDDLE_NAME, middleName);
         cv.put(DataBaseHelper.AGE, age);
         cv.put(DataBaseHelper.DATE, date);
         cv.put(DataBaseHelper.COMMENT, comment);
         long id = dbHelper.getWritableDatabase().insert(DataBaseHelper.PERSON_TABLE, null, cv);
         return new Person(id, firstName,
-                lastName, middleName, age, Utils.stringToDate(date), comment);
+                lastName, age, Utils.stringToDate(date), comment);
     }
 
     public void removePerson(Person person) {
@@ -47,7 +46,6 @@ public class DataManager {
                 DataBaseHelper.ID,
                 DataBaseHelper.FIRST_NAME,
                 DataBaseHelper.LAST_NAME,
-                DataBaseHelper.MIDDLE_NAME,
                 DataBaseHelper.AGE,
                 DataBaseHelper.DATE,
                 DataBaseHelper.COMMENT,
@@ -59,18 +57,24 @@ public class DataManager {
             long id = c.getLong(c.getColumnIndex(DataBaseHelper.ID));
             String firstName = c.getString(c.getColumnIndex(DataBaseHelper.FIRST_NAME));
             String lastName = c.getString(c.getColumnIndex(DataBaseHelper.LAST_NAME));
-            String middleName = c.getString(c.getColumnIndex(DataBaseHelper.MIDDLE_NAME));
             int age = c.getInt(c.getColumnIndex(DataBaseHelper.AGE));
             String stringDate = c.getString(c.getColumnIndex(DataBaseHelper.DATE));
             String comment = c.getString(c.getColumnIndex(DataBaseHelper.COMMENT));
             result.add(new Person(id, firstName, lastName,
-                    middleName, age, Utils.stringToDate(stringDate), comment));
+                    age, Utils.stringToDate(stringDate), comment));
         }
         return result;
     }
 
     public List<Person> getAllPersons() {
         return getPersonList(null, null);
+    }
+
+    public Person getPersonById(long id) {
+        String selection = DataBaseHelper.ID + "=?";
+        String[] args = {""+id,};
+        List<Person> resultList = getPersonList(selection, args);
+        return resultList.get(0);
     }
 
     public Audio saveAudio(long personId, boolean isHeart, int point,

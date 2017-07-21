@@ -7,7 +7,10 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import edu.phystech.stethoscope.data.DataBaseHelper;
+import edu.phystech.stethoscope.data.DataManager;
 import edu.phystech.stethoscope.player.DeviceConnectionManager;
+import edu.phystech.stethoscope.usecase.PersonUseCase;
 
 @Module
 public class AppModule {
@@ -28,5 +31,23 @@ public class AppModule {
     @Singleton
     DeviceConnectionManager provideDeviceConnectionManager() {
         return new DeviceConnectionManager(application);
+    }
+
+    @Provides
+    @Singleton
+    DataBaseHelper provideDataBaseHelper(Context context) {
+        return new DataBaseHelper(context);
+    }
+
+    @Provides
+    @Singleton
+    DataManager provideDataManager(DataBaseHelper dataBaseHelper) {
+        return new DataManager(dataBaseHelper);
+    }
+
+    @Provides
+    @Singleton
+    PersonUseCase providePersonUseCase(DataManager dataManager) {
+        return new PersonUseCase(dataManager);
     }
 }
