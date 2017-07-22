@@ -26,6 +26,7 @@ import edu.phystech.stethoscope.R;
 import edu.phystech.stethoscope.domain.Audio;
 import edu.phystech.stethoscope.player.DeviceConnectionManager;
 import edu.phystech.stethoscope.player.PlayerController;
+import edu.phystech.stethoscope.ui.audios.AudiosActivity;
 import edu.phystech.stethoscope.usecase.AudioUseCase;
 import edu.phystech.stethoscope.utils.Utils;
 import io.reactivex.Observer;
@@ -65,6 +66,8 @@ public class RecordActivity extends AppCompatActivity {
     FloatingActionButton recordButton;
     @BindView(R.id.play_button)
     FloatingActionButton playButton;
+    @BindView(R.id.floatingActionButton2)
+    FloatingActionButton listButton;
     @BindView(R.id.timer)
     TextView timer;
 
@@ -187,6 +190,15 @@ public class RecordActivity extends AppCompatActivity {
 
     private void initViews() {
         ButterKnife.bind(this);
+        listButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                playerController.stopPlaying();
+                unsubscribeFromAudioList();
+                unsubscribeFromState();
+                startActivity(AudiosActivity.getCallingIntent(personId, RecordActivity.this));
+            }
+        });
         redPoints = new ImageView[]{point1red, point2red, point3red, point4red, point5red};
         whitePoints = new ImageView[]{point1white, point2white, point3white, point4white, point5white};
         setPointsSelectable(false);

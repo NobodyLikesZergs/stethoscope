@@ -182,8 +182,7 @@
         app:backgroundTint="@color/button_color"
         android:layout_marginBottom="16dp"
         app:layout_constraintRight_toRightOf="@+id/body"
-        app:layout_constraintHorizontal_bias="0.2"
-        android:alpha="0.25" />
+        app:layout_constraintHorizontal_bias="0.2" />
 
     <android.support.design.widget.FloatingActionButton
         android:layout_height="64dp"
