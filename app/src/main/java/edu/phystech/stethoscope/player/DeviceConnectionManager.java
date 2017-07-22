@@ -54,7 +54,10 @@ public class DeviceConnectionManager {
                 new IntentFilter(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED));
     }
 
-    private void checkConnection() {
+    public void checkConnection() {
+        if (bm.getAdapter() == null || !bm.getAdapter().isEnabled()) {
+            stateSubject.onNext(STATE_DISCONNECTED);
+        }
         bm.getAdapter().getProfileProxy(context, listener, BluetoothProfile.HEADSET);
     }
 

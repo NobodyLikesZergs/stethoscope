@@ -10,6 +10,8 @@ import dagger.Provides;
 import edu.phystech.stethoscope.data.DataBaseHelper;
 import edu.phystech.stethoscope.data.DataManager;
 import edu.phystech.stethoscope.player.DeviceConnectionManager;
+import edu.phystech.stethoscope.player.PlayerController;
+import edu.phystech.stethoscope.usecase.AudioUseCase;
 import edu.phystech.stethoscope.usecase.PersonUseCase;
 
 @Module
@@ -49,5 +51,17 @@ public class AppModule {
     @Singleton
     PersonUseCase providePersonUseCase(DataManager dataManager) {
         return new PersonUseCase(dataManager);
+    }
+
+    @Provides
+    @Singleton
+    AudioUseCase provideAudioUseCase(DataManager dataManager) {
+        return new AudioUseCase(dataManager);
+    }
+
+    @Provides
+    @Singleton
+    PlayerController providePlayerController(AudioUseCase audioUseCase, Context context) {
+        return new PlayerController(audioUseCase, context);
     }
 }

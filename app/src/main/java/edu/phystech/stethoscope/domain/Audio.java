@@ -7,16 +7,14 @@ public class Audio {
     private int point;
     private int number;
     private String filePath;
-    private String comment;
 
     public Audio(long id, long personId,
-                 boolean isHeart, int point, int number, String filePath, String comment) {
+                 boolean isHeart, int point, int number, String filePath) {
         this.id = id;
         this.isHeart = isHeart;
         this.point = point;
         this.number = number;
         this.filePath = filePath;
-        this.comment = comment;
     }
 
     public long getId() {
@@ -37,10 +35,6 @@ public class Audio {
 
     public String getFilePath() {
         return filePath;
-    }
-
-    public String getComment() {
-        return comment;
     }
 
     public long getPersonId() {

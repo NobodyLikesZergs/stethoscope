@@ -106,7 +106,6 @@
         app:layout_constraintVertical_bias="0.31"
         app:layout_constraintRight_toLeftOf="@+id/guideline"
         android:visibility="gone"
-        android:layout_marginEnd="8dp"
         app:layout_constraintHorizontal_bias="0.95" />
 
     <ImageView
@@ -160,7 +159,6 @@
     <android.support.design.widget.FloatingActionButton
         android:layout_width="80dp"
         android:clickable="true"
-        app:fabSize="mini"
         app:srcCompat="@drawable/record_circle"
         android:id="@+id/recordButton"
         app:backgroundTint="@color/button_color"
@@ -168,11 +166,13 @@
         app:layout_constraintBottom_toBottomOf="@+id/body"
         android:layout_marginBottom="16dp"
         app:layout_constraintLeft_toLeftOf="@+id/body"
-        app:layout_constraintRight_toRightOf="@+id/body" />
+        app:layout_constraintRight_toRightOf="@+id/body"
+        android:alpha="0.25"
+        app:fabSize="normal" />
 
     <android.support.design.widget.FloatingActionButton
-        android:layout_width="56dp"
-        android:layout_height="56dp"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
         android:clickable="true"
         app:fabSize="normal"
         app:srcCompat="@drawable/check"
@@ -182,19 +182,33 @@
         app:backgroundTint="@color/button_color"
         android:layout_marginBottom="16dp"
         app:layout_constraintRight_toRightOf="@+id/body"
-        app:layout_constraintHorizontal_bias="0.2" />
+        app:layout_constraintHorizontal_bias="0.2"
+        android:alpha="0.25" />
 
     <android.support.design.widget.FloatingActionButton
-        android:layout_height="56dp"
-        android:layout_width="56dp"
+        android:layout_height="64dp"
+        android:layout_width="64dp"
         android:clickable="true"
         app:srcCompat="@drawable/back"
-        android:id="@+id/floatingActionButton3"
+        android:id="@+id/play_button"
         app:layout_constraintRight_toRightOf="@+id/body"
         app:layout_constraintLeft_toLeftOf="@+id/body"
         app:layout_constraintBottom_toBottomOf="@+id/body"
         app:layout_constraintHorizontal_bias="0.8"
         android:layout_marginBottom="16dp"
         app:backgroundTint="@color/button_color"
-        app:fabSize="normal" />
+        app:fabSize="normal"
+        android:alpha="0.25" />
+
+    <TextView
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/black"
+        android:id="@+id/timer"
+        android:gravity="center"
+        app:layout_constraintBottom_toTopOf="@+id/recordButton"
+        android:layout_marginBottom="16dp"
+        android:textSize="44sp"
+        app:layout_constraintLeft_toLeftOf="@+id/point2red"
+        app:layout_constraintRight_toRightOf="@+id/point3red" />
 </android.support.constraint.ConstraintLayout>

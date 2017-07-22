@@ -23,25 +23,23 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public static final String COMMENT = "comment";
         
     private static final int DB_VERSION = 1;
-    private static final String CREATE_STATEMENT =
+    private static final String CREATE_PERSON_STATEMENT =
             "CREATE TABLE " + PERSON_TABLE +" (" +
                     ID + " integer PRIMARY KEY AUTOINCREMENT NOT NULL, " +
                     FIRST_NAME + " text NOT NULL, " +
                     LAST_NAME + " text NOT NULL," +
                     AGE + " integer NOT NULL," +
                     DATE + " text NOT NULL," +
-                    COMMENT + " text NOT NULL" + ");" +
-                    "CREATE TABLE " + AUDIO_TABLE +" (" +
+                    COMMENT + " text NOT NULL" + ");";
+    private static final String CREATE_AUDIO_STATEMENT =
+            "CREATE TABLE " + AUDIO_TABLE +" (" +
                     ID + " integer PRIMARY KEY AUTOINCREMENT NOT NULL, " +
                     PERSON_ID + " integer NOT NULL, " +
                     POINT + " integer NOT NULL, " +
                     IS_HEART + " integer NOT NULL," +
                     FILE_PATH + " text NOT NULL," +
-                    NUMBER + " integer NOT NULL," +
-                    DATE + " text NOT NULL," +
-                    COMMENT + " text NOT NULL" +
+                    NUMBER + " integer NOT NULL" +
                     ");";
-    private Context context;
 
     @Inject
     public DataBaseHelper(Context context) {
@@ -50,7 +48,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(CREATE_STATEMENT);
+        db.execSQL(CREATE_PERSON_STATEMENT);
+        db.execSQL(CREATE_AUDIO_STATEMENT);
     }
 
     @Override

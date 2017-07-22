@@ -78,16 +78,15 @@ public class DataManager {
     }
 
     public Audio saveAudio(long personId, boolean isHeart, int point,
-                           int number, String filePath, String comment) {
+                           int number, String filePath) {
         ContentValues cv = new ContentValues();
         cv.put(DataBaseHelper.PERSON_ID, personId);
         cv.put(DataBaseHelper.IS_HEART, isHeart);
         cv.put(DataBaseHelper.POINT, point);
         cv.put(DataBaseHelper.NUMBER, number);
         cv.put(DataBaseHelper.FILE_PATH, filePath);
-        cv.put(DataBaseHelper.COMMENT, comment);
         long id = dbHelper.getWritableDatabase().insert(DataBaseHelper.AUDIO_TABLE, null, cv);
-        return new Audio(id, personId, isHeart, point, number, filePath, comment);
+        return new Audio(id, personId, isHeart, point, number, filePath);
     }
 
     public void removeAudio(Audio audio) {
@@ -111,7 +110,6 @@ public class DataManager {
                 DataBaseHelper.NUMBER,
                 DataBaseHelper.FILE_PATH,
                 DataBaseHelper.PERSON_ID,
-                DataBaseHelper.COMMENT,
         };
         Cursor c = dbHelper.getReadableDatabase().query(DataBaseHelper.AUDIO_TABLE,
                 columns, selection, selectionArgs, null, null, null);
@@ -123,8 +121,7 @@ public class DataManager {
             int number = c.getInt(c.getColumnIndex(DataBaseHelper.NUMBER));
             String filePath = c.getString(c.getColumnIndex(DataBaseHelper.FILE_PATH));
             long personId = c.getLong(c.getColumnIndex(DataBaseHelper.PERSON_ID));
-            String comment = c.getString(c.getColumnIndex(DataBaseHelper.COMMENT));
-            result.add(new Audio(id, personId, isHeart, point, number, filePath, comment));
+            result.add(new Audio(id, personId, isHeart, point, number, filePath));
         }
         return result;
     }
