@@ -180,6 +180,7 @@ public class RecordActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         playerController.stopPlaying();
+        playerController.detachCallback();
         unsubscribeFromAudioList();
         unsubscribeFromState();
     }
@@ -225,15 +226,16 @@ public class RecordActivity extends AppCompatActivity {
         recordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!playerController.isActive()) {
+                if (!playerController.isInProgress()) {
                     deviceConnectionManager.checkConnection();
                     if (state == DeviceConnectionManager.STATE_CONNECTED) {
                         applyRecordState();
-                        playerController.startRecord(personId, currentPoint, Utils.getLastAudioNumWithPoint(audioList, currentPoint) + 1);
+                        if (!playerController.startRecord(personId, currentPoint, Utils.getLastAudioNumWithPoint(audioList, currentPoint) + 1)) {
+                            Toast.makeText(RecordActivity.this, R.string.wait, Toast.LENGTH_SHORT).show();
+                        }
                     } else {
                         Toast.makeText(RecordActivity.this, R.string.connect_device, Toast.LENGTH_SHORT).show();
                     }
-
                 }
             }
         });
@@ -243,7 +245,9 @@ public class RecordActivity extends AppCompatActivity {
             playButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    playerController.startPlaying(Utils.getLastAudioWithPoint(audioList, currentPoint).getFilePath());
+                    if (!playerController.startPlaying(Utils.getLastAudioWithPoint(audioList, currentPoint).getFilePath())) {
+                        Toast.makeText(RecordActivity.this, R.string.wait, Toast.LENGTH_SHORT).show();
+                    }
                     applyPlayState();
                 }
             });

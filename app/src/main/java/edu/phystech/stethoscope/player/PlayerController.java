@@ -1,18 +1,21 @@
 package edu.phystech.stethoscope.player;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
 import android.media.MediaRecorder;
 import android.os.Environment;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 
 import javax.inject.Inject;
 
@@ -29,35 +32,44 @@ public class PlayerController {
     public static final int RATE = 11025;
     private final static String SAVE_DIR = "/stet";
 
-    private volatile boolean active = false;
+    private volatile boolean shouldBeInProgress = false;
+    private volatile boolean inProgress = false;
     private Disposable audioDisposable = Disposables.disposed();
     private AudioUseCase audioUseCase;
     private AudioManager am;
-    private WeakReference<PlaytimeCallback> playtimeCallback;
+    private PlaytimeCallback playtimeCallback;
+    private Context context;
 
     @Inject
     public PlayerController(AudioUseCase audioUseCase, Context context) {
         this.audioUseCase = audioUseCase;
         am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        this.context = context;
     }
 
-    public boolean isActive() {
-        return active;
+    public boolean isInProgress() {
+        return inProgress;
     }
 
     public void setPlayTimeCallBack(PlaytimeCallback playTimeCallBack) {
-        this.playtimeCallback = new WeakReference<PlaytimeCallback>(playTimeCallBack);
+        this.playtimeCallback = playTimeCallBack;
+    }
+
+    public void detachCallback() {
+        this.playtimeCallback = null;
     }
 
     public void notifyCallback(long time) {
-        if (playtimeCallback.get() != null) {
-            playtimeCallback.get().playtimeUpdated(time);
+        if (playtimeCallback != null) {
+            playtimeCallback.playtimeUpdated(time);
         }
     }
 
-    public void startRecord(long personId, int point, int number) {
-        if (active) return;
-        active = true;
+    public boolean startRecord(long personId, int point, int number) {
+        if (inProgress) {
+            return false;
+        }
+        shouldBeInProgress = true;
         File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+SAVE_DIR);
         dir.mkdir();
         String filePath = Environment.getExternalStorageDirectory().getAbsolutePath()
@@ -74,8 +86,7 @@ public class PlayerController {
 
                     @Override
                     public void onSuccess(@NonNull final Audio audio) {
-                                    new Thread(new RecordRunnable(audio.getFilePath())).start();
-                        am.startBluetoothSco();
+                        registerReceiverForRecord(audio);
                     }
 
                     @Override
@@ -84,23 +95,49 @@ public class PlayerController {
                     }
                 }
         );
+        return true;
+    }
+
+    private void registerReceiverForRecord (final Audio audio) {
+        context.registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                int state = intent.getIntExtra(AudioManager.EXTRA_SCO_AUDIO_STATE, -1);
+                Log.d("OLOLOG", "Audio SCO state: " + state);
+                if (AudioManager.SCO_AUDIO_STATE_CONNECTED == state) {
+                    if (!inProgress) {
+                        inProgress = true;
+                        new Thread(new RecordRunnable(audio.getFilePath())).start();
+                    }
+                    context.unregisterReceiver(this);
+                    }
+                }
+        }, new IntentFilter(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED));
+//        if (am.isBluetoothScoOn()) {
+            am.stopBluetoothSco();
+//        }
+        am.startBluetoothSco();
     }
 
     public void stopRecord() {
-        active = false;
+        shouldBeInProgress = false;
         if (!audioDisposable.isDisposed()) {
             audioDisposable.dispose();
         }
     }
 
-    public void startPlaying(String file) {
-        if (active) return;
+    public boolean startPlaying(String file) {
+        if (inProgress) {
+            return false;
+        }
+        shouldBeInProgress = true;
+        inProgress = true;
         new Thread(new PlayRunnable(file)).start();
-        active = true;
+        return true;
     }
 
     public void stopPlaying() {
-        active = false;
+        shouldBeInProgress = false;
     }
 
     public interface PlaytimeCallback {
@@ -120,9 +157,9 @@ public class PlayerController {
             int buffersize = AudioRecord.getMinBufferSize(RATE, AudioFormat.CHANNEL_IN_STEREO,
                     AudioFormat.ENCODING_PCM_16BIT);
             AudioRecord arec = new AudioRecord(MediaRecorder.AudioSource.MIC, RATE,
-                    AudioFormat.CHANNEL_IN_STEREO, MediaRecorder.AudioEncoder.AMR_NB, buffersize);
+                    AudioFormat.CHANNEL_IN_MONO, MediaRecorder.AudioEncoder.AMR_NB, buffersize);
             AudioTrack atrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL, RATE,
-                    AudioFormat.CHANNEL_IN_STEREO, MediaRecorder.AudioEncoder.AMR_NB, buffersize,
+                    AudioFormat.CHANNEL_OUT_MONO, MediaRecorder.AudioEncoder.AMR_NB, buffersize,
                     AudioTrack.MODE_STREAM);
             atrack.setPlaybackRate(RATE);
             byte[] buffer = new byte[buffersize];
@@ -132,7 +169,7 @@ public class PlayerController {
             notifyCallback(0);
             try {
                 FileOutputStream os = new FileOutputStream(filePath+".pcm");
-                while(active) {
+                while(shouldBeInProgress) {
                     if (System.currentTimeMillis() - time > 1000) {
                         notifyCallback(System.currentTimeMillis() - time);
                     }
@@ -142,10 +179,14 @@ public class PlayerController {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+                atrack.release();
+                arec.release();
+                inProgress = false;
             }
             am.stopBluetoothSco();
             atrack.release();
             arec.release();
+            inProgress = false;
             try {
                 AudioUtils.rawToWave(new File(filePath+".pcm"), new File(filePath+".wav"));
             } catch (IOException e) {
@@ -168,7 +209,7 @@ public class PlayerController {
             int buffersize = AudioRecord.getMinBufferSize(RATE, AudioFormat.CHANNEL_IN_STEREO,
                     AudioFormat.ENCODING_PCM_16BIT);
             AudioTrack atrack = new AudioTrack(AudioManager.STREAM_VOICE_CALL, RATE,
-                    AudioFormat.CHANNEL_IN_STEREO, MediaRecorder.AudioEncoder.AMR_NB, buffersize,
+                    AudioFormat.CHANNEL_OUT_MONO, MediaRecorder.AudioEncoder.AMR_NB, buffersize,
                     AudioTrack.MODE_STREAM);
             atrack.setPlaybackRate(RATE);
             byte[] buffer = new byte[buffersize];
@@ -177,7 +218,7 @@ public class PlayerController {
             notifyCallback(0);
             try {
                 FileInputStream is = new FileInputStream(filePath+".pcm");
-                while(active && is.read(buffer, 0, buffersize) > 1) {
+                while(shouldBeInProgress && is.read(buffer, 0, buffersize) > 1) {
                     atrack.write(buffer, 0, buffer.length);
                     if (System.currentTimeMillis() - time > 1000) {
                         notifyCallback(System.currentTimeMillis() - time);
@@ -185,9 +226,12 @@ public class PlayerController {
                 }
                 notifyCallback(-1);
             } catch (IOException e) {
+                atrack.release();
                 e.printStackTrace();
+                inProgress = false;
             }
             atrack.release();
+            inProgress = false;
         }
     }
 

@@ -174,7 +174,7 @@
         android:layout_height="64dp"
         android:clickable="true"
         app:fabSize="normal"
-        app:srcCompat="@drawable/check"
+        app:srcCompat="@drawable/ic_list_white_24dp"
         android:id="@+id/floatingActionButton2"
         app:layout_constraintBottom_toBottomOf="@+id/body"
         app:layout_constraintLeft_toLeftOf="@+id/body"
@@ -207,6 +207,6 @@
         app:layout_constraintBottom_toTopOf="@+id/recordButton"
         android:layout_marginBottom="16dp"
         android:textSize="44sp"
-        app:layout_constraintLeft_toLeftOf="@+id/point2red"
-        app:layout_constraintRight_toRightOf="@+id/point3red" />
+        app:layout_constraintLeft_toLeftOf="@+id/body"
+        app:layout_constraintRight_toRightOf="@+id/body" />
 </android.support.constraint.ConstraintLayout>
