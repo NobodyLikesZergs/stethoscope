@@ -38,8 +38,8 @@ public class AudioUtils {
             writeInt(output, 16); // subchunk 1 size
             writeShort(output, (short) 1); // audio format (1 = PCM)
             writeShort(output, (short) 1); // number of channels
-            writeInt(output, PlayerController.RATE * 2); // sample rate
-            writeInt(output, PlayerController.RATE * 2); // byte rate
+            writeInt(output, PlayerController.RATE * 1); // sample rate
+            writeInt(output, PlayerController.RATE * 1); // byte rate
             writeShort(output, (short) 2); // block align
             writeShort(output, (short) 16); // bits per sample
             writeString(output, "data"); // subchunk 2 id

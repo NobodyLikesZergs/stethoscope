@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,6 +21,7 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import edu.phystech.stethoscope.BuildConfig;
 import edu.phystech.stethoscope.MyApplication;
 import edu.phystech.stethoscope.R;
 import edu.phystech.stethoscope.domain.Audio;
@@ -132,7 +134,7 @@ public class AudiosActivity extends AppCompatActivity {
         for (Audio audio: adapter.getSelectedAudios())
         {
             File fileIn = new File(audio.getFilePath()+".wav");
-            Uri u = Uri.fromFile(fileIn);
+            Uri u = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".provider", fileIn);
             uris.add(u);
         }
         emailIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
