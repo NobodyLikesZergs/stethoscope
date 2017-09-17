@@ -34,11 +34,17 @@ public class DataManager {
                 lastName, age, Utils.stringToDate(date), comment);
     }
 
-    public void removePerson(Person person) {
-        removeAudiosByPerson(person);
+    public void removePerson(long id) {
+        removeAudiosByPerson(id);
         String whereClause = DataBaseHelper.ID + "=?";
-        String[] args = {""+person.getId(),};
+        String[] args = {""+id,};
         dbHelper.getWritableDatabase().delete(DataBaseHelper.PERSON_TABLE, whereClause, args);
+    }
+
+    public void removePersonList(List<Long> persons) {
+        for (Long person: persons) {
+            removePerson(person);
+        }
     }
 
     private List<Person> getPersonList(String selection, String[] selectionArgs) {
@@ -89,16 +95,22 @@ public class DataManager {
         return new Audio(id, personId, isHeart, point, number, filePath);
     }
 
-    public void removeAudio(Audio audio) {
+    public void removeAudio(long audio) {
         String whereClause = DataBaseHelper.ID + "=?";
-        String[] args = {""+audio.getId(),};
+        String[] args = {""+audio,};
         dbHelper.getWritableDatabase().delete(DataBaseHelper.AUDIO_TABLE, whereClause, args);
     }
 
-    public void removeAudiosByPerson(Person person) {
-        List<Audio> audioList = getAudiosByPerson(person);
+    public void removeAudiosByPerson(long personId) {
+        List<Audio> audioList = getAudiosByPerson(personId);
         for (Audio a: audioList) {
-            removeAudio(a);
+            removeAudio(a.getId());
+        }
+    }
+
+    public void removeAudioList(List<Long> audios) {
+        for (Long audio: audios) {
+            removeAudio(audio);
         }
     }
 
@@ -126,9 +138,9 @@ public class DataManager {
         return result;
     }
 
-    public List<Audio> getAudiosByPerson(Person person) {
+    public List<Audio> getAudiosByPerson(long personId) {
         String selection = DataBaseHelper.PERSON_ID + " = ?";
-        String[] args = {""+person.getId(), };
+        String[] args = {""+personId, };
         return getAudioList(selection, args);
     }
 }

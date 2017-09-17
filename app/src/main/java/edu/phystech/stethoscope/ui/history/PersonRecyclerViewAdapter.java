@@ -43,7 +43,9 @@ public class PersonRecyclerViewAdapter extends RecyclerView.Adapter<PersonRecycl
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                cardOnClickListener.onClick(persons.get(position).getId());
+                if (cardOnClickListener != null) {
+                    cardOnClickListener.onClick(persons.get(position).getId());
+                }
             }
         });
     }

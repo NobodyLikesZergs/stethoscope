@@ -32,7 +32,7 @@ public class AudioUseCase {
         }).map(new Function<Person, List<Audio>>() {
             @Override
             public List<Audio> apply(@NonNull Person person) throws Exception {
-                return dataManager.getAudiosByPerson(person);
+                return dataManager.getAudiosByPerson(person.getId());
             }
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
     }
@@ -43,6 +43,16 @@ public class AudioUseCase {
             @Override
             public Audio call() throws Exception {
                 return dataManager.saveAudio(personId, isHeart, point, number, filePath);
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Single<Integer> removeAudioList(final List<Long> audios) {
+        return Single.fromCallable(new Callable<Integer>() {
+            @Override
+            public Integer call() throws Exception {
+                dataManager.removeAudioList(audios);
+                return 1;
             }
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
     }

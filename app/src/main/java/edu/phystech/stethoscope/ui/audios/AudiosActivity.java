@@ -40,12 +40,15 @@ public class AudiosActivity extends AppCompatActivity {
     RecyclerView audioRecyclerView;
     @BindView(R.id.share_button)
     ImageView shareButton;
+    @BindView(R.id.trash_button)
+    ImageView trashButton;
 
     private AudiosRecyclerViewAdapter adapter;
 
     @Inject
     AudioUseCase audioUseCase;
 
+    private Disposable removeAudioListDisposable = Disposables.disposed();
     private Disposable audioDisposable = Disposables.disposed();
     private SingleObserver<List<Audio>> audioObserver = new SingleObserver<List<Audio>>() {
         @Override
@@ -87,12 +90,29 @@ public class AudiosActivity extends AppCompatActivity {
     private void initViews() {
         ButterKnife.bind(this);
         audioRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new AudiosRecyclerViewAdapter();
+        adapter = new AudiosRecyclerViewAdapter(new AudiosRecyclerViewAdapter.OnClickListener() {
+            @Override
+            public void onClick(List<Integer> selectionList, long id) {
+                if (selectionList.isEmpty()) {
+                    shareButton.setVisibility(View.GONE);
+                    trashButton.setVisibility(View.GONE);
+                } else {
+                    shareButton.setVisibility(View.VISIBLE);
+                    trashButton.setVisibility(View.VISIBLE);
+                }
+            }
+        });
         audioRecyclerView.setAdapter(adapter);
         shareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 email();
+            }
+        });
+        trashButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteAudios();
             }
         });
     }
@@ -102,6 +122,9 @@ public class AudiosActivity extends AppCompatActivity {
     private void unsubscribe() {
         if (!audioDisposable.isDisposed()) {
             audioDisposable.dispose();
+        }
+        if (!removeAudioListDisposable.isDisposed()) {
+            removeAudioListDisposable.dispose();
         }
     }
 
@@ -114,6 +137,35 @@ public class AudiosActivity extends AppCompatActivity {
     protected void onDestroy() {
         unsubscribe();
         super.onDestroy();
+    }
+
+    public void deleteAudios() {
+        List<Long> selectedId = adapter.getSelectedIdList();
+        if (adapter.getSelectedAudios().isEmpty()) {
+            Toast.makeText(this, "Выберите записи", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (removeAudioListDisposable.isDisposed()) {
+            removeAudioListDisposable.dispose();
+        }
+        audioUseCase.removeAudioList(selectedId).subscribe(new SingleObserver<Integer>() {
+            @Override
+            public void onSubscribe(@NonNull Disposable d) {
+                removeAudioListDisposable = d;
+            }
+
+            @Override
+            public void onSuccess(@NonNull Integer aInteger) {
+                adapter.removeSelected();
+                Toast.makeText(AudiosActivity.this, "Данные удалены", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+                e.printStackTrace();
+                Toast.makeText(AudiosActivity.this, "Что-то пошло не так", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public void email() {

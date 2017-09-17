@@ -47,4 +47,14 @@ public class PersonUseCase {
             }
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
     }
+
+    public Single<Void> removePersonList(final List<Long> persons) {
+        return Single.fromCallable(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                dataManager.removePersonList(persons);
+                return null;
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+    }
 }

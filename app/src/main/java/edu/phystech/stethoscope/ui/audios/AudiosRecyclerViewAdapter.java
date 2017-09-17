@@ -18,6 +18,15 @@ public class AudiosRecyclerViewAdapter extends
 
     private List<Audio> audios = new ArrayList<>();
     private List<Integer> selectionList = new ArrayList<>();
+    private OnClickListener cardOnClickListener;
+
+    public interface OnClickListener {
+        void onClick(List<Integer> selectionList, long id);
+    }
+
+    public AudiosRecyclerViewAdapter(OnClickListener cardOnClickListener) {
+        this.cardOnClickListener = cardOnClickListener;
+    }
 
     @Override
     public PersonViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -39,6 +48,15 @@ public class AudiosRecyclerViewAdapter extends
         return res;
     }
 
+    public void removeSelected() {
+        audios.removeAll(getSelectedAudios());
+        selectionList = new ArrayList<>();
+        if (cardOnClickListener != null) {
+            cardOnClickListener.onClick(selectionList, -1);
+        }
+        notifyDataSetChanged();
+    }
+
     @Override
     public void onBindViewHolder(final PersonViewHolder holder, final int position) {
         holder.name.setText("Сердце   Точка " + (audios.get(position).getPoint()+1) +
@@ -46,15 +64,30 @@ public class AudiosRecyclerViewAdapter extends
         holder.selection.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (selectionList.contains(position)) {
-                    selectionList.remove(Integer.valueOf(position));
-                    holder.selection.setImageResource(R.drawable.not_selected);
-                } else {
-                    selectionList.add(position);
-                    holder.selection.setImageResource(R.drawable.selected);
+                handleSelection(holder, position);
+                if (cardOnClickListener != null) {
+                    cardOnClickListener.onClick(selectionList, audios.get(position).getId());
                 }
             }
         });
+    }
+
+    public List<Long> getSelectedIdList() {
+        List<Long> result = new ArrayList<>();
+        for (Integer selectedPos: selectionList) {
+            result.add(audios.get(selectedPos).getId());
+        }
+        return result;
+    }
+
+    private void handleSelection(PersonViewHolder holder, int position) {
+        if (selectionList.contains(position)) {
+            selectionList.remove(Integer.valueOf(position));
+            holder.selection.setImageResource(R.drawable.not_selected);
+        } else {
+            selectionList.add(position);
+            holder.selection.setImageResource(R.drawable.selected);
+        }
     }
 
     @Override

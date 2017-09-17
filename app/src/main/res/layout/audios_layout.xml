@@ -18,6 +18,19 @@
         android:layout_alignParentStart="true"
         android:layout_margin="16dp"
         android:scaleType="fitStart"
+        android:visibility="gone"
         android:id="@+id/share_button"
+        />
+
+    <ImageView
+        android:src="@drawable/trash"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="16dp"
+        android:scaleType="fitStart"
+        android:visibility="gone"
+        android:id="@+id/trash_button"
         />
 </RelativeLayout>
