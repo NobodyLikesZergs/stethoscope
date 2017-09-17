@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -16,13 +17,33 @@ public class PersonRecyclerViewAdapter extends RecyclerView.Adapter<PersonRecycl
 
     private List<Person> persons = new ArrayList<>();
     private OnClickListener cardOnClickListener;
+    private OnClickListener onSelectionClickListener;
+    private List<Integer> selectionList = new ArrayList<>();
 
     public interface OnClickListener {
-        void onClick(long id);
+        void onClick(List<Integer> selectionList, long id);
     }
 
-    public PersonRecyclerViewAdapter(OnClickListener onClickListener) {
+    public PersonRecyclerViewAdapter(OnClickListener onClickListener, OnClickListener onSelectionClickListener) {
         this.cardOnClickListener = onClickListener;
+        this.onSelectionClickListener = onSelectionClickListener;
+    }
+
+    public List<Person> getSelectedPersons() {
+        List<Person> res = new ArrayList<>();
+        for (int i: selectionList) {
+            res.add(persons.get(i));
+        }
+        return res;
+    }
+
+    public void removeSelected() {
+        persons.removeAll(getSelectedPersons());
+        selectionList = new ArrayList<>();
+        if (onSelectionClickListener != null) {
+            onSelectionClickListener.onClick(selectionList, -1);
+        }
+        notifyDataSetChanged();
     }
 
     @Override
@@ -38,16 +59,43 @@ public class PersonRecyclerViewAdapter extends RecyclerView.Adapter<PersonRecycl
     }
 
     @Override
-    public void onBindViewHolder(PersonViewHolder holder, final int position) {
+    public void onBindViewHolder(final PersonViewHolder holder, final int position) {
         holder.name.setText(persons.get(position).getFirstName() + " " + persons.get(position).getLastName());
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (cardOnClickListener != null) {
-                    cardOnClickListener.onClick(persons.get(position).getId());
+                    cardOnClickListener.onClick(selectionList, persons.get(position).getId());
                 }
             }
         });
+        holder.selection.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                handleSelection(holder, position);
+                if (onSelectionClickListener != null) {
+                    onSelectionClickListener.onClick(selectionList, persons.get(position).getId());
+                }
+            }
+        });
+    }
+
+    public List<Long> getSelectedIdList() {
+        List<Long> result = new ArrayList<>();
+        for (Integer selectedPos: selectionList) {
+            result.add(persons.get(selectedPos).getId());
+        }
+        return result;
+    }
+
+    private void handleSelection(PersonViewHolder holder, int position) {
+        if (selectionList.contains(position)) {
+            selectionList.remove(Integer.valueOf(position));
+            holder.selection.setImageResource(R.drawable.not_selected);
+        } else {
+            selectionList.add(position);
+            holder.selection.setImageResource(R.drawable.selected);
+        }
     }
 
     @Override
@@ -59,11 +107,13 @@ public class PersonRecyclerViewAdapter extends RecyclerView.Adapter<PersonRecycl
 
         View cardView;
         TextView name;
+        ImageView selection;
 
         public PersonViewHolder(View itemView) {
             super(itemView);
             cardView = itemView;
             name = (TextView) itemView.findViewById(R.id.person_name_text_view);
+            selection = (ImageView) itemView.findViewById(R.id.selection);
         }
     }
 }

@@ -4,6 +4,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -25,6 +28,8 @@ public class HistoryActivity extends AppCompatActivity {
 
     @BindView(R.id.person_recycler_view)
     RecyclerView personRecyclerView;
+    @BindView(R.id.trash_button)
+    ImageView trashButton;
 
     private PersonRecyclerViewAdapter adapter;
 
@@ -32,6 +37,8 @@ public class HistoryActivity extends AppCompatActivity {
     PersonUseCase personUseCase;
 
     private Disposable personListDisposable = Disposables.disposed();
+    private Disposable removePersonListDisposable = Disposables.disposed();
+
     private SingleObserver<List<Person>> personListObserver = new SingleObserver<List<Person>>() {
         @Override
         public void onSubscribe(@NonNull Disposable d) {
@@ -68,8 +75,23 @@ public class HistoryActivity extends AppCompatActivity {
         personRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new PersonRecyclerViewAdapter(new PersonRecyclerViewAdapter.OnClickListener() {
             @Override
-            public void onClick(long id) {
+            public void onClick(List<Integer> selectionList, long id) {
                 startActivity(RecordActivity.getCallingIntent(HistoryActivity.this, id));
+            }
+        }, new PersonRecyclerViewAdapter.OnClickListener() {
+            @Override
+            public void onClick(List<Integer> selectionList, long id) {
+                if (selectionList.isEmpty()) {
+                    trashButton.setVisibility(View.GONE);
+                } else {
+                    trashButton.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+        trashButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                removePersons();
             }
         });
         personRecyclerView.setAdapter(adapter);
@@ -79,6 +101,38 @@ public class HistoryActivity extends AppCompatActivity {
         if (!personListDisposable.isDisposed()) {
             personListDisposable.dispose();
         }
+        if (!removePersonListDisposable.isDisposed()) {
+            removePersonListDisposable.dispose();
+        }
+    }
+
+    private void removePersons() {
+        List<Long> selectedId = adapter.getSelectedIdList();
+        if (adapter.getSelectedPersons().isEmpty()) {
+            Toast.makeText(this, "Выберите записи", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (removePersonListDisposable.isDisposed()) {
+            removePersonListDisposable.dispose();
+        }
+        personUseCase.removePersonList(selectedId).subscribe(new SingleObserver<Integer>() {
+            @Override
+            public void onSubscribe(@NonNull Disposable d) {
+                removePersonListDisposable = d;
+            }
+
+            @Override
+            public void onSuccess(@NonNull Integer aInteger) {
+                adapter.removeSelected();
+                Toast.makeText(HistoryActivity.this, "Данные удалены", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+                e.printStackTrace();
+                Toast.makeText(HistoryActivity.this, "Что-то пошло не так", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void subscribe() {
