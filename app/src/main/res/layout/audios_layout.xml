@@ -63,7 +63,7 @@
         android:layout_height="40dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
-        android:layout_margin="16dp"
+        android:layout_marginLeft="24dp"
         android:scaleType="fitStart"
         android:visibility="gone"
         android:id="@+id/share_button"
@@ -75,9 +75,9 @@
         android:layout_height="40dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:layout_margin="16dp"
+        android:layout_marginRight="16dp"
         android:scaleType="fitStart"
-        android:visibility="gone"
         android:id="@+id/trash_button"
+        android:visibility="gone"
         />
 </RelativeLayout>
