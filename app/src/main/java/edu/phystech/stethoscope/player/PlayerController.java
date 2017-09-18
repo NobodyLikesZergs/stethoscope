@@ -32,10 +32,10 @@ public class PlayerController {
     public static final int RATE = 11025;
     private final static String SAVE_DIR = "/stet";
 
-    private volatile boolean shouldBeInProgress = false;
-    private volatile boolean inProgress = false;
-    private Disposable audioDisposable = Disposables.disposed();
-    private AudioUseCase audioUseCase;
+    protected volatile boolean shouldBeInProgress = false;
+    protected volatile boolean inProgress = false;
+    protected Disposable audioDisposable = Disposables.disposed();
+    protected AudioUseCase audioUseCase;
     private AudioManager am;
     private PlaytimeCallback playtimeCallback;
     private Context context;
@@ -98,7 +98,7 @@ public class PlayerController {
         return true;
     }
 
-    private void registerReceiverForRecord (final Audio audio) {
+    protected void registerReceiverForRecord (final Audio audio) {
         context.registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
