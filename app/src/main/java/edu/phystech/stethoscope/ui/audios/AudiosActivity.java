@@ -11,6 +11,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -25,7 +26,9 @@ import edu.phystech.stethoscope.BuildConfig;
 import edu.phystech.stethoscope.MyApplication;
 import edu.phystech.stethoscope.R;
 import edu.phystech.stethoscope.domain.Audio;
+import edu.phystech.stethoscope.domain.Person;
 import edu.phystech.stethoscope.usecase.AudioUseCase;
+import edu.phystech.stethoscope.usecase.PersonUseCase;
 import io.reactivex.SingleObserver;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
@@ -42,12 +45,21 @@ public class AudiosActivity extends AppCompatActivity {
     ImageView shareButton;
     @BindView(R.id.trash_button)
     ImageView trashButton;
+    @BindView(R.id.selected_num)
+    TextView selectedNumTextView;
+    @BindView(R.id.unselect_all)
+    ImageView unselectAllImageView;
+    @BindView(R.id.person_name)
+    TextView personNameTextView;
 
     private AudiosRecyclerViewAdapter adapter;
 
     @Inject
     AudioUseCase audioUseCase;
+    @Inject
+    PersonUseCase personUseCase;
 
+    private Disposable personDisposable = Disposables.disposed();
     private Disposable removeAudioListDisposable = Disposables.disposed();
     private Disposable audioDisposable = Disposables.disposed();
     private SingleObserver<List<Audio>> audioObserver = new SingleObserver<List<Audio>>() {
@@ -94,9 +106,16 @@ public class AudiosActivity extends AppCompatActivity {
             @Override
             public void onClick(List<Integer> selectionList, long id) {
                 if (selectionList.isEmpty()) {
+                    personNameTextView.setVisibility(View.VISIBLE);
+                    selectedNumTextView.setVisibility(View.GONE);
+                    unselectAllImageView.setVisibility(View.GONE);
                     shareButton.setVisibility(View.GONE);
                     trashButton.setVisibility(View.GONE);
                 } else {
+                    selectedNumTextView.setText("Выбрано: " + selectionList.size());
+                    personNameTextView.setVisibility(View.GONE);
+                    selectedNumTextView.setVisibility(View.VISIBLE);
+                    unselectAllImageView.setVisibility(View.VISIBLE);
                     shareButton.setVisibility(View.VISIBLE);
                     trashButton.setVisibility(View.VISIBLE);
                 }
@@ -115,6 +134,12 @@ public class AudiosActivity extends AppCompatActivity {
                 deleteAudios();
             }
         });
+        unselectAllImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                adapter.unselectAll();
+            }
+        });
     }
 
 
@@ -126,11 +151,30 @@ public class AudiosActivity extends AppCompatActivity {
         if (!removeAudioListDisposable.isDisposed()) {
             removeAudioListDisposable.dispose();
         }
+        if (!personDisposable.isDisposed()) {
+            personDisposable.dispose();
+        }
     }
 
     private void subscribe() {
         unsubscribe();
         audioUseCase.getAudioByPersonId(this.personId).subscribe(audioObserver);
+        personUseCase.getPersonById(this.personId).subscribe(new SingleObserver<Person>() {
+            @Override
+            public void onSubscribe(@NonNull Disposable d) {
+                personDisposable = d;
+            }
+
+            @Override
+            public void onSuccess(@NonNull Person person) {
+                personNameTextView.setText(person.getFirstName() + " " + person.getLastName());
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     @Override

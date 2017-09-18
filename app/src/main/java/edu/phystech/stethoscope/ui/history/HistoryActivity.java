@@ -6,6 +6,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
@@ -30,6 +31,10 @@ public class HistoryActivity extends AppCompatActivity {
     RecyclerView personRecyclerView;
     @BindView(R.id.trash_button)
     ImageView trashButton;
+    @BindView(R.id.unselect_all)
+    ImageView unselectAllImageView;
+    @BindView(R.id.selected_num)
+    TextView selectedNumTextView;
 
     private PersonRecyclerViewAdapter adapter;
 
@@ -82,8 +87,13 @@ public class HistoryActivity extends AppCompatActivity {
             @Override
             public void onClick(List<Integer> selectionList, long id) {
                 if (selectionList.isEmpty()) {
+                    selectedNumTextView.setVisibility(View.GONE);
+                    unselectAllImageView.setVisibility(View.GONE);
                     trashButton.setVisibility(View.GONE);
                 } else {
+                    selectedNumTextView.setText("Выбрано: " + selectionList.size());
+                    selectedNumTextView.setVisibility(View.VISIBLE);
+                    unselectAllImageView.setVisibility(View.VISIBLE);
                     trashButton.setVisibility(View.VISIBLE);
                 }
             }
@@ -95,6 +105,12 @@ public class HistoryActivity extends AppCompatActivity {
             }
         });
         personRecyclerView.setAdapter(adapter);
+        unselectAllImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                adapter.unselectAll();
+            }
+        });
     }
 
     private void unsubscribe() {

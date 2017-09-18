@@ -48,6 +48,14 @@ public class AudiosRecyclerViewAdapter extends
         return res;
     }
 
+    public void unselectAll() {
+        selectionList = new ArrayList<>();
+        if (cardOnClickListener != null) {
+            cardOnClickListener.onClick(selectionList, -1);
+        }
+        notifyDataSetChanged();
+    }
+
     public void removeSelected() {
         audios.removeAll(getSelectedAudios());
         selectionList = new ArrayList<>();
@@ -61,7 +69,12 @@ public class AudiosRecyclerViewAdapter extends
     public void onBindViewHolder(final PersonViewHolder holder, final int position) {
         holder.name.setText("Сердце   Точка " + (audios.get(position).getPoint()+1) +
                 "   Запись " + audios.get(position).getNumber());
-        holder.selection.setOnClickListener(new View.OnClickListener() {
+        if (selectionList.contains(position)) {
+            holder.selection.setImageResource(R.drawable.selected);
+        } else {
+            holder.selection.setImageResource(R.drawable.not_selected);
+        }
+        holder.wholeView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 handleSelection(holder, position);
@@ -99,9 +112,11 @@ public class AudiosRecyclerViewAdapter extends
 
         TextView name;
         ImageView selection;
+        View wholeView;
 
         public PersonViewHolder(View itemView) {
             super(itemView);
+            wholeView = itemView;
             name = (TextView) itemView.findViewById(R.id.person_name_text_view);
             selection = (ImageView) itemView.findViewById(R.id.selection);
         }

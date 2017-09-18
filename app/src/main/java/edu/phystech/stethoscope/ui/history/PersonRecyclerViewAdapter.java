@@ -58,9 +58,22 @@ public class PersonRecyclerViewAdapter extends RecyclerView.Adapter<PersonRecycl
         notifyDataSetChanged();
     }
 
+    public void unselectAll() {
+        selectionList = new ArrayList<>();
+        if (onSelectionClickListener != null) {
+            onSelectionClickListener.onClick(selectionList, -1);
+        }
+        notifyDataSetChanged();
+    }
+
     @Override
     public void onBindViewHolder(final PersonViewHolder holder, final int position) {
         holder.name.setText(persons.get(position).getFirstName() + " " + persons.get(position).getLastName());
+        if (selectionList.contains(position)) {
+            holder.selection.setImageResource(R.drawable.selected);
+        } else {
+            holder.selection.setImageResource(R.drawable.not_selected);
+        }
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
