@@ -37,6 +37,20 @@ public class AudioUseCase {
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
     }
 
+    public Single<List<Audio>> getAudioByPersonId(final long personId, final int isHeart) {
+        return Single.fromCallable(new Callable<Person>() {
+            @Override
+            public Person call() throws Exception {
+                return dataManager.getPersonById(personId);
+            }
+        }).map(new Function<Person, List<Audio>>() {
+            @Override
+            public List<Audio> apply(@NonNull Person person) throws Exception {
+                return dataManager.getAudiosByPerson(person.getId(), isHeart);
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+    }
+
     public Single<Audio> saveAudio(final long personId, final boolean isHeart, final int point,
                                    final int number, final String filePath) {
         return Single.fromCallable(new Callable<Audio>() {

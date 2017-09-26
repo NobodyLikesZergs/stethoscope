@@ -19,7 +19,7 @@ public class MockPlayerController extends PlayerController {
     }
 
     @Override
-    public boolean startRecord(long personId, int point, int number) {
+    public boolean startRecord(long personId, int point, int number, boolean a) {
         if (inProgress) {
             return false;
         }

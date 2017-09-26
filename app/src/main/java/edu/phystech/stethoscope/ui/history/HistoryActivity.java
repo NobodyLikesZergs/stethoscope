@@ -18,7 +18,7 @@ import butterknife.ButterKnife;
 import edu.phystech.stethoscope.MyApplication;
 import edu.phystech.stethoscope.R;
 import edu.phystech.stethoscope.domain.Person;
-import edu.phystech.stethoscope.ui.RecordActivity;
+import edu.phystech.stethoscope.ui.audios.AudiosActivity;
 import edu.phystech.stethoscope.usecase.PersonUseCase;
 import io.reactivex.SingleObserver;
 import io.reactivex.annotations.NonNull;
@@ -81,7 +81,7 @@ public class HistoryActivity extends AppCompatActivity {
         adapter = new PersonRecyclerViewAdapter(new PersonRecyclerViewAdapter.OnClickListener() {
             @Override
             public void onClick(List<Integer> selectionList, long id) {
-                startActivity(RecordActivity.getCallingIntent(HistoryActivity.this, id));
+                startActivity(AudiosActivity.getCallingIntent(HistoryActivity.this, id));
             }
         }, new PersonRecyclerViewAdapter.OnClickListener() {
             @Override

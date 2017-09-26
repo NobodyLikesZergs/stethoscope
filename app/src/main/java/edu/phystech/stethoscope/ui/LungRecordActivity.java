@@ -34,8 +34,7 @@ import io.reactivex.SingleObserver;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.disposables.Disposables;
 
-public class RecordActivity extends AppCompatActivity {
-
+public class LungRecordActivity extends AppCompatActivity {
     public static final String PERSON_ID_EXTRA = "PERSON_ID_EXTRA";
     public static final int REQUEST_RECORD_AUDIO_PERMISSION = 846;
     public static final int REQUEST_EXTERNAL_STORAGE_PERMISSION = 523;
@@ -52,6 +51,8 @@ public class RecordActivity extends AppCompatActivity {
     ImageView point4red;
     @BindView(R.id.point5red)
     ImageView point5red;
+    @BindView(R.id.point6red)
+    ImageView point6red;
     @BindView(R.id.point1white)
     ImageView point1white;
     @BindView(R.id.point2white)
@@ -62,6 +63,42 @@ public class RecordActivity extends AppCompatActivity {
     ImageView point4white;
     @BindView(R.id.point5white)
     ImageView point5white;
+    @BindView(R.id.point6white)
+    ImageView point6white;
+
+    @BindView(R.id.point_back1red)
+    ImageView pointBack1red;
+    @BindView(R.id.point_back2red)
+    ImageView pointBack2red;
+    @BindView(R.id.point_back3red)
+    ImageView pointBack3red;
+    @BindView(R.id.point_back4red)
+    ImageView pointBack4red;
+    @BindView(R.id.point_back5red)
+    ImageView pointBack5red;
+    @BindView(R.id.point_back6red)
+    ImageView pointBack6red;
+    @BindView(R.id.point_back7red)
+    ImageView pointBack7red;
+    @BindView(R.id.point_back8red)
+    ImageView pointBack8red;
+    @BindView(R.id.point_back1white)
+    ImageView pointBack1white;
+    @BindView(R.id.point_back2white)
+    ImageView pointBack2white;
+    @BindView(R.id.point_back3white)
+    ImageView pointBack3white;
+    @BindView(R.id.point_back4white)
+    ImageView pointBack4white;
+    @BindView(R.id.point_back5white)
+    ImageView pointBack5white;
+    @BindView(R.id.point_back6white)
+    ImageView pointBack6white;
+    @BindView(R.id.point_back7white)
+    ImageView pointBack7white;
+    @BindView(R.id.point_back8white)
+    ImageView pointBack8white;
+
     @BindView(R.id.recordButton)
     FloatingActionButton recordButton;
     @BindView(R.id.play_button)
@@ -70,6 +107,13 @@ public class RecordActivity extends AppCompatActivity {
     FloatingActionButton listButton;
     @BindView(R.id.timer)
     TextView timer;
+
+    @BindView(R.id.body)
+    ImageView body;
+    @BindView(R.id.body_back)
+    ImageView bodyBack;
+    @BindView(R.id.rotate)
+    ImageView rotateIcon;
 
     @Inject
     PlayerController playerController;
@@ -126,11 +170,14 @@ public class RecordActivity extends AppCompatActivity {
     ImageView[] redPoints;
     ImageView[] whitePoints;
 
+    ImageView[] backRedPoints;
+    ImageView[] backWhitePoints;
+
     private long personId;
     private int currentPoint = 0;
 
     public static Intent getCallingIntent(Context context, long personId) {
-        Intent intent = new Intent(context, RecordActivity.class);
+        Intent intent = new Intent(context, LungRecordActivity.class);
         intent.putExtra(PERSON_ID_EXTRA, personId);
         return intent;
     }
@@ -138,7 +185,7 @@ public class RecordActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.record_layout);
+        setContentView(R.layout.lung_record_activity);
         personId = getIntent().getExtras().getLong(PERSON_ID_EXTRA);
         inject();
         deviceConnectionManager.startListening();
@@ -197,22 +244,65 @@ public class RecordActivity extends AppCompatActivity {
                 playerController.stopPlaying();
                 unsubscribeFromAudioList();
                 unsubscribeFromState();
-                startActivity(AudiosActivity.getCallingIntent(personId, RecordActivity.this));
+                startActivity(AudiosActivity.getCallingIntent(LungRecordActivity.this, personId));
             }
         });
-        redPoints = new ImageView[]{point1red, point2red, point3red, point4red, point5red};
-        whitePoints = new ImageView[]{point1white, point2white, point3white, point4white, point5white};
+        redPoints = new ImageView[]{point1red, point2red, point3red, point4red, point5red, point6red};
+        whitePoints = new ImageView[]{point1white, point2white, point3white, point4white, point5white, point6white};
+        backRedPoints = new ImageView[]{pointBack1red, pointBack2red, pointBack3red, pointBack4red, pointBack5red, pointBack6red, pointBack7red, pointBack8red};
+        backWhitePoints = new ImageView[]{pointBack1white, pointBack2white, pointBack3white, pointBack4white, pointBack5white, pointBack6white, pointBack7white, pointBack8white};
+        rotateIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rotate(true);
+            }
+        });
         setPointsSelectable(false);
     }
 
+    private void rotate(final boolean toBack) {
+        body.setVisibility(toBack ? View.INVISIBLE : View.VISIBLE);
+        bodyBack.setVisibility(toBack ? View.VISIBLE : View.INVISIBLE);
+        for (int i = 0; i < 6; i++) {
+            whitePoints[i].setVisibility(toBack ? View.GONE : View.VISIBLE);
+            redPoints[i].setVisibility(View.GONE);
+        }
+        for (int i = 0; i < 8; i++) {
+            backWhitePoints[i].setVisibility(toBack ? View.VISIBLE : View.GONE);
+            backRedPoints[i].setVisibility(View.GONE);
+        }
+        if (toBack) {
+            setSelectedPoint(6, true);
+        } else {
+            setSelectedPoint(0, false);
+        }
+        rotateIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rotate(!toBack);
+            }
+        });
+    }
+
     private void setPointsSelectable(final boolean selectable) {
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 6; i++) {
             final int finalI = i;
             whitePoints[i].setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (selectable) {
-                        setSelectedPoint(finalI);
+                        setSelectedPoint(finalI, false);
+                    }
+                }
+            });
+        }
+        for (int i = 0; i < 8; i++) {
+            final int finalI = i;
+            backWhitePoints[i].setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (selectable) {
+                        setSelectedPoint(finalI + 6, true);
                     }
                 }
             });
@@ -230,11 +320,11 @@ public class RecordActivity extends AppCompatActivity {
                     deviceConnectionManager.checkConnection();
                     if (state == DeviceConnectionManager.STATE_CONNECTED) {
                         applyRecordState();
-                        if (!playerController.startRecord(personId, currentPoint, Utils.getLastAudioNumWithPoint(audioList, currentPoint) + 1)) {
-                            Toast.makeText(RecordActivity.this, R.string.wait, Toast.LENGTH_SHORT).show();
+                        if (!playerController.startRecord(personId, currentPoint, Utils.getLastAudioNumWithPoint(audioList, currentPoint) + 1, false)) {
+                            Toast.makeText(LungRecordActivity.this, R.string.wait, Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        Toast.makeText(RecordActivity.this, R.string.connect_device, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LungRecordActivity.this, R.string.connect_device, Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -246,7 +336,7 @@ public class RecordActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     if (!playerController.startPlaying(Utils.getLastAudioWithPoint(audioList, currentPoint).getFilePath())) {
-                        Toast.makeText(RecordActivity.this, R.string.wait, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LungRecordActivity.this, R.string.wait, Toast.LENGTH_SHORT).show();
                     }
                     applyPlayState();
                 }
@@ -298,12 +388,24 @@ public class RecordActivity extends AppCompatActivity {
         playButton.setImageResource(R.drawable.pause_icon);
     }
 
-    private void setSelectedPoint(int newSelectedPoint) {
-        redPoints[currentPoint].setVisibility(View.GONE);
-        whitePoints[currentPoint].setVisibility(View.VISIBLE);
-        whitePoints[newSelectedPoint].setVisibility(View.GONE);
-        redPoints[newSelectedPoint].setVisibility(View.VISIBLE);
-        currentPoint = newSelectedPoint;
+    private void setSelectedPoint(int newSelectedPoint, boolean isBack) {
+        if (!isBack) {
+            if (currentPoint < 6) {
+                redPoints[currentPoint].setVisibility(View.GONE);
+                whitePoints[currentPoint].setVisibility(View.VISIBLE);
+            }
+            whitePoints[newSelectedPoint].setVisibility(View.GONE);
+            redPoints[newSelectedPoint].setVisibility(View.VISIBLE);
+            currentPoint = newSelectedPoint;
+        } else {
+            if (currentPoint >= 6) {
+                backRedPoints[currentPoint - 6].setVisibility(View.GONE);
+                backWhitePoints[currentPoint - 6].setVisibility(View.VISIBLE);
+            }
+            backWhitePoints[newSelectedPoint - 6].setVisibility(View.GONE);
+            backRedPoints[newSelectedPoint - 6].setVisibility(View.VISIBLE);
+            currentPoint = newSelectedPoint;
+        }
         applyWaitState();
     }
 
@@ -316,7 +418,7 @@ public class RecordActivity extends AppCompatActivity {
 
     private void subscribeOnAudioList() {
         unsubscribeFromAudioList();
-        audioUseCase.getAudioByPersonId(personId).subscribe(audioObserver);
+        audioUseCase.getAudioByPersonId(personId, 0).subscribe(audioObserver);
     }
 
     private void unsubscribeFromAudioList() {

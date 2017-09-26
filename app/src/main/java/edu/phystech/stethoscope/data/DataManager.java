@@ -143,4 +143,10 @@ public class DataManager {
         String[] args = {""+personId, };
         return getAudioList(selection, args);
     }
+
+    public List<Audio> getAudiosByPerson(long personId, int isHeart) {
+        String selection = DataBaseHelper.PERSON_ID + " = ? and " + DataBaseHelper.IS_HEART + " = ?";
+        String[] args = {""+personId, ""+isHeart};
+        return getAudioList(selection, args);
+    }
 }

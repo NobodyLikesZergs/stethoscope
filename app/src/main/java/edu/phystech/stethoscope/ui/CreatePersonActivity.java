@@ -50,7 +50,8 @@ public class CreatePersonActivity extends AppCompatActivity {
 
         @Override
         public void onSuccess(@NonNull Person p) {
-            startActivity(RecordActivity.getCallingIntent(CreatePersonActivity.this, p.getId()));
+            startActivity(SelectRecordTypeActivity.getCallingIntent(CreatePersonActivity.this,
+                    p.getId()));
             finish();
         }
 

@@ -7,4 +7,5 @@
     <string name="connect_device">Пожалуйста, подключите устройство</string>
     <string name="fill_fields">Заполните поля</string>
     <string name="wait">Пожалуйста, подождите</string>
+    <string name="chose_side">Выберите орган</string>
 </resources>

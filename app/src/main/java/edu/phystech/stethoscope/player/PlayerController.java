@@ -65,19 +65,20 @@ public class PlayerController {
         }
     }
 
-    public boolean startRecord(long personId, int point, int number) {
+    public boolean startRecord(long personId, int point, int number, boolean isHeart) {
         if (inProgress) {
             return false;
         }
         shouldBeInProgress = true;
         File dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+SAVE_DIR);
         dir.mkdir();
+        String place = isHeart ? "_heart_" : "_lungs_";
         String filePath = Environment.getExternalStorageDirectory().getAbsolutePath()
-                + SAVE_DIR + "/personId_" + personId + "_point_" + point + "_recnum_" + number;
+                + SAVE_DIR + "/personId_" + personId + place+ "_point_" + point + "_recnum_" + number;
         if (!audioDisposable.isDisposed()) {
             audioDisposable.dispose();
         }
-        audioUseCase.saveAudio(personId, true, point, number, filePath).subscribe(
+        audioUseCase.saveAudio(personId, isHeart, point, number, filePath).subscribe(
                 new SingleObserver<Audio>() {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {

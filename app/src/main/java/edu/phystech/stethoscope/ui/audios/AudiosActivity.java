@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -27,6 +28,7 @@ import edu.phystech.stethoscope.MyApplication;
 import edu.phystech.stethoscope.R;
 import edu.phystech.stethoscope.domain.Audio;
 import edu.phystech.stethoscope.domain.Person;
+import edu.phystech.stethoscope.ui.SelectRecordTypeActivity;
 import edu.phystech.stethoscope.usecase.AudioUseCase;
 import edu.phystech.stethoscope.usecase.PersonUseCase;
 import io.reactivex.SingleObserver;
@@ -51,6 +53,8 @@ public class AudiosActivity extends AppCompatActivity {
     ImageView unselectAllImageView;
     @BindView(R.id.person_name)
     TextView personNameTextView;
+    @BindView(R.id.new_measure)
+    FloatingActionButton newMeasure;
 
     private AudiosRecyclerViewAdapter adapter;
 
@@ -79,9 +83,10 @@ public class AudiosActivity extends AppCompatActivity {
         }
     };
 
-    public static Intent getCallingIntent(long personId, Context context) {
+    public static Intent getCallingIntent(Context context, long personId) {
         Intent intent = new Intent(context, AudiosActivity.class);
         intent.putExtra(PERSON_EXTRA, personId);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         return intent;
     }
 
@@ -111,6 +116,7 @@ public class AudiosActivity extends AppCompatActivity {
                     unselectAllImageView.setVisibility(View.GONE);
                     shareButton.setVisibility(View.GONE);
                     trashButton.setVisibility(View.GONE);
+                    newMeasure.show();
                 } else {
                     selectedNumTextView.setText("Выбрано: " + selectionList.size());
                     personNameTextView.setVisibility(View.GONE);
@@ -118,6 +124,7 @@ public class AudiosActivity extends AppCompatActivity {
                     unselectAllImageView.setVisibility(View.VISIBLE);
                     shareButton.setVisibility(View.VISIBLE);
                     trashButton.setVisibility(View.VISIBLE);
+                    newMeasure.hide();
                 }
             }
         });
@@ -168,6 +175,12 @@ public class AudiosActivity extends AppCompatActivity {
             @Override
             public void onSuccess(@NonNull Person person) {
                 personNameTextView.setText(person.getFirstName() + " " + person.getLastName());
+                newMeasure.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        startActivity(SelectRecordTypeActivity.getCallingIntent(AudiosActivity.this, personId));
+                    }
+                });
             }
 
             @Override
