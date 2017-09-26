@@ -170,11 +170,16 @@ public class PlayerController {
             notifyCallback(0);
             try {
                 FileOutputStream os = new FileOutputStream(filePath+".pcm");
+                Butterworth butterworth = new Butterworth();
+                butterworth.initialize(20, 1000);
                 while(shouldBeInProgress) {
                     if (System.currentTimeMillis() - time > 1000) {
                         notifyCallback(System.currentTimeMillis() - time);
                     }
                     arec.read(buffer, 0, buffersize);
+                    for (int i = 0; i < buffer.length; i++) {
+                        buffer[i] = (byte) butterworth.process(buffer[i]);
+                    }
                     atrack.write(buffer, 0, buffer.length);
                     os.write(buffer, 0, buffer.length);
                 }
