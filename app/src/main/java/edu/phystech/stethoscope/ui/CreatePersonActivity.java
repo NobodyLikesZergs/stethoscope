@@ -66,7 +66,7 @@ public class CreatePersonActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         inject();
-        setContentView(R.layout.create_person_activity);
+        setContentView(R.layout.new_person_layout);
         initViews();
     }
 

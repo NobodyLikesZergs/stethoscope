@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center">
+
+    <TextView
+        android:text="@string/new_person"
+        android:layout_width="wrap_content"
+        android:layout_margin="32dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView2"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textAllCaps="true"
+        android:textSize="24sp"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        >
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:ems="10"
+            android:id="@+id/name_field"
+            android:hint="Имя"
+            />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:ems="10"
+            android:id="@+id/last_name_field"
+            android:layout_marginTop="16dp"
+            android:hint="Фамилия"
+            />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:ems="10"
+            android:id="@+id/age_field"
+            android:layout_marginTop="16dp"
+            android:hint="Возраст"
+            />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:ems="10"
+            android:id="@+id/comment_field"
+            android:layout_marginTop="16dp"
+            android:hint="Комментарий"
+            />
+
+
+        <Button
+            android:text="Сохранить"
+            android:layout_width="156dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/save_button"
+            android:layout_marginTop="32dp"
+            android:background="@color/button_color"
+            android:textColor="@color/white_color" />
+
+        <Button
+            android:text="Отменить"
+            android:layout_width="156dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/cancel_button"
+            android:layout_marginTop="32dp"
+            android:background="@color/button_color"
+            android:textColor="@color/white_color" />
+    </LinearLayout>
+
+</LinearLayout>

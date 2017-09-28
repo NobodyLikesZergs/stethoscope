@@ -63,6 +63,7 @@
         android:layout_height="40dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
+        android:layout_marginBottom="24dp"
         android:layout_marginStart="24dp"
         android:scaleType="fitStart"
         android:visibility="gone"
@@ -75,10 +76,11 @@
         android:layout_height="40dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginEnd="16dp"
+        android:visibility="gone"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="24dp"
         android:scaleType="fitStart"
         android:id="@+id/trash_button"
-        android:visibility="gone"
         />
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/new_measure"
